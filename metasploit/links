@@ -1,0 +1,2 @@
+msfconsole /usr/local/bin/msfconsole
+msfvenom /usr/local/bin/msfvenom
