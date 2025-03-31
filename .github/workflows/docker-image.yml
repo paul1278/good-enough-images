@@ -35,3 +35,10 @@ jobs:
         context: ./metasploit
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:msf
+    - name: Build and push Certipy
+      id: push
+      uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      with:
+        context: ./certipy
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:certipy
