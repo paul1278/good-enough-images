@@ -1,2 +1,2 @@
-responder.py /usr/local/bin/responder.py
-/Responder/tools/MultiRelay.py /usr/local/bin/responder-multirelay.py
+responder.py
+/Responder/tools/MultiRelay.py responder-multirelay.py
