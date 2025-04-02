@@ -34,6 +34,8 @@ if [ `id -u` -ne 0 ]; then
     exit 1
 fi
 
+cd `dirname "$0"`
+
 function install_image {
     IMG_NAME="$1"
     mkdir -p /opt/good-enough-images/bin
@@ -47,12 +49,20 @@ function install_image {
     LINKS_FILE="$IMAGE_DIR/links"
 
     if [[ -f "$RUN_SCRIPT" && -f "$LINKS_FILE" ]]; then
-        cp "$RUN_SCRIPT" /opt/good-enough-images/bin/$IMG_NAME.sh
-        while IFS= read -r LINK_PATH; do
+        cp "$RUN_SCRIPT" /opt/good-enough-images/bin/g-$IMG_NAME
+        while IFS= read -r LINK_PATH || [ "$LINK_PATH" ]; do
+            # Skip empty lines and comments
+            if [[ -z "$LINK_PATH" || "$LINK_PATH" =~ ^# ]]; then
+                continue
+            fi
             # Split on \t into name and path
             IFS=$' ' read -r NAME LPATH <<< "$LINK_PATH"
+            if [ -z "$LPATH" ]; then
+              LPATH="$NAME"
+            fi
+            LPATH="/opt/good-enough-images/bin/$LPATH"
             echo "Linking $NAME to $LPATH"
-            printf "#!/bin/bash\n/opt/good-enough-images/bin/$IMG_NAME.sh $NAME \$@" > $LPATH
+            printf "#!/bin/bash\n/opt/good-enough-images/bin/g-$IMG_NAME $NAME \$@" > $LPATH
             chmod +x $LPATH
         done < "$LINKS_FILE"
     else
@@ -61,6 +71,15 @@ function install_image {
     fi
 }
 
+# Copy default.conf to /etc/good-enough-images.conf
+if [ ! -f /etc/good-enough-images.conf ]; then
+    cp ./default.conf /etc/good-enough-images.conf
+fi
+
+# Add /opt/good-enough-images/bin to PATH
+if ! grep -q "/opt/good-enough-images/bin" /etc/environment; then
+    echo "PATH=\"/opt/good-enough-images/bin:\$PATH\"" >> /etc/environment
+fi
 
 if [ "$INSTALL_EVERYTHING" = "1" ]; then
   echo "Installing everything..."
