@@ -1,6 +1,7 @@
 #!/bin/bash
 INSTALL_EVERYTHING=0
 IMAGE_NAME=""
+UNINSTALL=0
 POSITIONAL_ARGS=()
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -11,6 +12,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     -a|--all)
         INSTALL_EVERYTHING=1
+        shift
+      ;;
+    -u|--uninstall)
+        UNINSTALL=1
         shift
       ;;
     -*|--*)
@@ -77,18 +82,32 @@ if [ ! -f /etc/good-enough-images.conf ]; then
 fi
 
 # Add /opt/good-enough-images/bin to PATH
-if ! grep -q "/opt/good-enough-images/bin" /etc/environment; then
-    echo "PATH=\"/opt/good-enough-images/bin:\$PATH\"" >> /etc/environment
+if ! grep -q "MARKER: good-enough-images" /etc/environment; then
+    echo "PATH=\"/opt/good-enough-images/bin:\$PATH\" # MARKER: good-enough-images" >> /etc/environment
 fi
 
 if [ "$INSTALL_EVERYTHING" = "1" ]; then
-  echo "Installing everything..."
+  if [ "$UNINSTALL" = "1" ]; then
+    echo "Uninstalling everything..."
+    echo -n "Warning: This will remove all images, links, configs and working directories inside /opt/good-enough-images. Are you sure? [y/n] "
+    read -r answer
+    if [[ ! $answer =~ ^[Yy]$ ]]; then
+        echo "Aborting."
+        exit 1
+    fi
+    rm -r /opt/good-enough-images 2> /dev/null
+    rm -r /etc/good-enough-images.conf 2> /dev/null
+    sed -i '/MARKER: good-enough-images/d' /etc/environment
+    echo "Done."
+  else
+    echo "Installing everything..."
     for dir in */; do
         if [ -d "$dir" ]; then
             IMAGE_NAME="${dir%/}"
             install_image "$IMAGE_NAME"
         fi
     done
+  fi
 else
   echo "Installing image: $IMAGE_NAME"
   install_image "$IMAGE_NAME"
