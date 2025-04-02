@@ -109,6 +109,18 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
     done
   fi
 else
-  echo "Installing image: $IMAGE_NAME"
-  install_image "$IMAGE_NAME"
+  if [ "$UNINSTALL" = "1" ]; then
+    echo "Uninstalling image: $IMAGE_NAME"
+    echo -n "Warning: This will remove all images, links, configs and working directories inside /opt/good-enough-images/$IMAGE_NAME. Are you sure? [y/n] "
+    read -r answer
+    if [[ ! $answer =~ ^[Yy]$ ]]; then
+        echo "Aborting."
+        exit 1
+    fi
+    # TODO: Remove bin links
+    rm -r /opt/good-enough-images/$IMAGE_NAME 2> /dev/null
+  else
+    echo "Installing image: $IMAGE_NAME"
+    install_image "$IMAGE_NAME"
+  fi
 fi
