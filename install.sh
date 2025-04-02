@@ -53,6 +53,7 @@ function install_image {
     RUN_SCRIPT="$IMAGE_DIR/run.sh"
     LINKS_FILE="$IMAGE_DIR/links"
 
+    # TODO: Move this to a new function for removing etc.
     if [[ -f "$RUN_SCRIPT" && -f "$LINKS_FILE" ]]; then
         cp "$RUN_SCRIPT" /opt/good-enough-images/bin/g-$IMG_NAME
         while IFS= read -r LINK_PATH || [ "$LINK_PATH" ]; do
