@@ -1,14 +1,11 @@
-name: Docker Image CI
+name: Build responder
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-on:
-  push:
-    branches: [ "main" ]
+  CONTEXT: responder
+on: workflow_dispatch
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
     permissions:
           contents: read
@@ -28,10 +25,10 @@ jobs:
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-    - name: Build and push Certipy
+    - name: Build and push ${{ env.CONTEXT }}
       id: push
       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
       with:
-        context: ./certipy
+        context: ./${{ env.CONTEXT }}
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:certipy
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.CONTEXT }}
