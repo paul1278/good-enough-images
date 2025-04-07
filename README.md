@@ -15,5 +15,5 @@ the configuration file under `/etc/good-enough-images.conf`.
 When it comes to networking, all containers use the `host`-network.
 
 ## Install
-Simply clone the repo and run `./install.sh -a`. To uninstall everything, use `./install.sh -a --uninstall`. You can also install a selection of images,
+Simply clone the repo and run `./install.sh -a`. To uninstall everything, use `./install.sh -a --remove`. You can also install a selection of images,
 for that run `./install.sh --image <imagename>`.

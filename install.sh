@@ -2,13 +2,28 @@
 INSTALL_EVERYTHING=0
 IMAGE_NAME=""
 UNINSTALL=0
+UPDATE=1
 
 RESET="\e[0m"
 BOLD="\e[1m"
 
+function usage {
+    echo "Usage: $0 [options]"
+    echo "Options:"
+    echo "  -i, --image <image>   Select a specific image"
+    echo "  -a, --all             Select all images"
+    echo "  -u, --update          Update the image"
+    echo "  -r, --remove          Uninstall the image"
+    echo "  -h, --help            Show this help message"
+}
+
 POSITIONAL_ARGS=()
 while [[ $# -gt 0 ]]; do
   case $1 in
+    -h|--help)
+        usage
+        exit 0
+      ;;
     -i|--image)
         IMAGE_NAME="$2"
         shift # past argument
@@ -18,7 +33,11 @@ while [[ $# -gt 0 ]]; do
         INSTALL_EVERYTHING=1
         shift
       ;;
-    -u|--uninstall)
+    -u|--update)
+        UPDATE=1
+        shift
+      ;;
+    -r|--remove)
         UNINSTALL=1
         shift
       ;;
@@ -121,6 +140,14 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
     rm -r /etc/good-enough-images.conf 2> /dev/null
     rm $ENV_FILE 2> /dev/null
     echo "Done."
+  elif [ "$UPDATE" = "1" ]; then
+    echo "Updating everything..."
+    for dir in */; do
+        if [ -d "$dir" ]; then
+            IMAGE_NAME="${dir%/}"
+            docker pull ghcr.io/paul1278/good-enough-images:$IMAGE_NAME
+        fi
+    done
   else
     echo "Installing everything..."
     for dir in */; do
@@ -142,6 +169,9 @@ else
     fi
     # TODO: Remove bin links
     rm -r /opt/good-enough-images/$IMAGE_NAME 2> /dev/null
+  elif [ "$UPDATE" = "1" ]; then
+    echo "Updating image: $IMAGE_NAME"
+    docker pull ghcr.io/paul1278/good-enough-images:$IMAGE_NAME
   else
     install_image "$IMAGE_NAME"
   fi
