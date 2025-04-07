@@ -6,6 +6,12 @@ if [ -z "$IMAGE" ]; then
     exit 1
 fi
 
+source /etc/good-enough-images.conf
+ALLWORKDIR="$include_workdir"
+if [ -z "$ALLWORKDIR" ]; then
+    ALLWORKDIR="/opt/good-enough-images/workdir/all"
+fi
+
 PARAM="$@"
 if [ -z "$PARAM" ]; then
     PARAM="bash"
@@ -26,7 +32,7 @@ if [ -f "$MOUNTFILE" ]; then
     done < "$MOUNTFILE"
 fi
 
-sudo docker run --rm -i -t --network host --workdir /main \
-    -v /opt/good-enough-images/workdir/all:/main \
+echo sudo docker run --rm -i -t --network host --workdir /main \
+    -v $ALLWORKDIR:/main \
     $MOUNTPARAMS \
     ghcr.io/paul1278/good-enough-images:$IMAGE $PARAM
