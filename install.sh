@@ -2,6 +2,10 @@
 INSTALL_EVERYTHING=0
 IMAGE_NAME=""
 UNINSTALL=0
+
+RESET="\e[0m"
+BOLD="\e[1m"
+
 POSITIONAL_ARGS=()
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -46,7 +50,7 @@ function install_image {
     mkdir -p /opt/good-enough-images/bin
     mkdir -p /opt/good-enough-images/workdir/all
     mkdir -p /opt/good-enough-images/workdir/$IMG_NAME
-    echo "Installing image: $IMG_NAME"
+    printf "╠ Installing image: $BOLD$IMG_NAME$RESET\n"
     
     # Open directory with that name and look for run.sh and links-file relative to this file.
     # If both exist, copy run.sh to /opt/good-enough-images/bin and link to every path in links-file
@@ -55,7 +59,7 @@ function install_image {
     RUN_SCRIPT="$IMAGE_DIR/run.sh"
     LINKS_FILE="$IMAGE_DIR/links"
     
-    cp "$IMAGE_DIR"/mount /opt/good-enough-images/configs/$IMG_NAME.mount
+    cp "$IMAGE_DIR"/mount /opt/good-enough-images/configs/$IMG_NAME.mount 2>/dev/null
 
     if [ -f "$RUN_SCRIPT" ]; then
       cp "$RUN_SCRIPT" /opt/good-enough-images/bin/g-$IMG_NAME
@@ -65,7 +69,6 @@ function install_image {
 /opt/good-enough-images/runbase.sh $IMG_NAME "\$@"
 EOF
       chmod +x /opt/good-enough-images/bin/g-$IMG_NAME
-      echo "Warning: run.sh not found in $IMAGE_DIR, using default runbase.sh"
     fi
     # TODO: Move this to a new function for removing etc.
     if [[ -f "$LINKS_FILE" ]]; then
@@ -80,7 +83,7 @@ EOF
               LPATH="$NAME"
             fi
             LPATH="/opt/good-enough-images/bin/$LPATH"
-            echo "Linking $NAME to $LPATH"
+            printf "╠═ Linking $BOLD$NAME$RESET to $LPATH\n"
             printf "#!/bin/bash\n/opt/good-enough-images/bin/g-$IMG_NAME $NAME \$@" > $LPATH
             chmod +x $LPATH
         done < "$LINKS_FILE"
@@ -124,6 +127,7 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
         if [ -d "$dir" ]; then
             IMAGE_NAME="${dir%/}"
             install_image "$IMAGE_NAME"
+            echo "║"
         fi
     done
   fi
@@ -139,7 +143,6 @@ else
     # TODO: Remove bin links
     rm -r /opt/good-enough-images/$IMAGE_NAME 2> /dev/null
   else
-    echo "Installing image: $IMAGE_NAME"
     install_image "$IMAGE_NAME"
   fi
 fi
