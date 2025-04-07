@@ -32,7 +32,7 @@ if [ -f "$MOUNTFILE" ]; then
     done < "$MOUNTFILE"
 fi
 
-echo sudo docker run --rm -i -t --network host --workdir /main \
+sudo docker run --rm -i -t --network host --workdir /main \
     -v $ALLWORKDIR:/main \
     $MOUNTPARAMS \
     ghcr.io/paul1278/good-enough-images:$IMAGE $PARAM
