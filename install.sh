@@ -44,6 +44,8 @@ cd `dirname "$0"`
 function install_image {
     IMG_NAME="$1"
     mkdir -p /opt/good-enough-images/bin
+    mkdir -p /opt/good-enough-images/workdir/all
+    mkdir -p /opt/good-enough-images/workdir/$IMG_NAME
     echo "Installing image: $IMG_NAME"
     
     # Open directory with that name and look for run.sh and links-file relative to this file.
@@ -52,10 +54,21 @@ function install_image {
     IMAGE_DIR="$(dirname "$(realpath "$0")")/$IMG_NAME"
     RUN_SCRIPT="$IMAGE_DIR/run.sh"
     LINKS_FILE="$IMAGE_DIR/links"
+    
+    cp "$IMAGE_DIR"/mount /opt/good-enough-images/configs/$IMG_NAME.mount
 
+    if [ -f "$RUN_SCRIPT" ]; then
+      cp "$RUN_SCRIPT" /opt/good-enough-images/bin/g-$IMG_NAME
+    else
+      cat <<EOF > /opt/good-enough-images/bin/g-$IMG_NAME
+#!/bin/bash
+/opt/good-enough-images/runbase.sh $IMG_NAME "\$@"
+EOF
+      chmod +x /opt/good-enough-images/bin/g-$IMG_NAME
+      echo "Warning: run.sh not found in $IMAGE_DIR, using default runbase.sh"
+    fi
     # TODO: Move this to a new function for removing etc.
-    if [[ -f "$RUN_SCRIPT" && -f "$LINKS_FILE" ]]; then
-        cp "$RUN_SCRIPT" /opt/good-enough-images/bin/g-$IMG_NAME
+    if [[ -f "$LINKS_FILE" ]]; then
         while IFS= read -r LINK_PATH || [ "$LINK_PATH" ]; do
             # Skip empty lines and comments
             if [[ -z "$LINK_PATH" || "$LINK_PATH" =~ ^# ]]; then
@@ -87,6 +100,10 @@ ENV_FILE="/etc/environment.d/99-good-enough-images.conf"
 if [ ! -f "$ENV_FILE" ]; then
     echo "PATH=\"/opt/good-enough-images/bin:\$PATH\"" > "$ENV_FILE"
 fi
+
+mkdir -p /opt/good-enough-images
+cp ./runbase.sh /opt/good-enough-images/runbase.sh
+chmod +x /opt/good-enough-images/runbase.sh
 
 if [ "$INSTALL_EVERYTHING" = "1" ]; then
   if [ "$UNINSTALL" = "1" ]; then
