@@ -12,11 +12,6 @@ if [ -z "$ALLWORKDIR" ]; then
     ALLWORKDIR="/opt/good-enough-images/workdir/all"
 fi
 
-PARAM="$@"
-if [ -z "$PARAM" ]; then
-    PARAM="bash"
-fi
-
 MOUNTFILE=/opt/good-enough-images/configs/$IMAGE.mount
 MOUNTPARAMS=""
 if [ -f "$MOUNTFILE" ]; then
@@ -35,4 +30,4 @@ fi
 sudo docker run --rm -i -t --network host --workdir /main \
     -v $ALLWORKDIR:/main \
     $MOUNTPARAMS \
-    ghcr.io/paul1278/good-enough-images:$IMAGE $PARAM
+    ghcr.io/paul1278/good-enough-images:$IMAGE "$@"

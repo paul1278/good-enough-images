@@ -103,7 +103,7 @@ EOF
             fi
             LPATH="/opt/good-enough-images/bin/$LPATH"
             printf "╠═ Linking $BOLD$NAME$RESET to $LPATH\n"
-            printf "#!/bin/bash\n/opt/good-enough-images/bin/g-$IMG_NAME $NAME \$@" > $LPATH
+            printf "#!/bin/bash\n/opt/good-enough-images/bin/g-$IMG_NAME $NAME \"\$@\"" > $LPATH
             chmod +x $LPATH
         done < "$LINKS_FILE"
     else
@@ -149,7 +149,7 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
         fi
     done
   else
-    echo "Installing everything..."
+    echo "╔════════ Installing everything..."
     for dir in */; do
         if [ -d "$dir" ]; then
             IMAGE_NAME="${dir%/}"
@@ -157,6 +157,7 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
             echo "║"
         fi
     done
+    echo "╚════════ Done."
   fi
 else
   if [ "$UNINSTALL" = "1" ]; then
