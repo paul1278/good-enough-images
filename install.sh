@@ -83,8 +83,9 @@ if [ ! -f /etc/good-enough-images.conf ]; then
 fi
 
 # Add /opt/good-enough-images/bin to PATH
-if ! grep -q "MARKER: good-enough-images" /etc/environment; then
-    echo "PATH=\"/opt/good-enough-images/bin:\$PATH\" # MARKER: good-enough-images" >> /etc/environment
+ENV_FILE="/etc/environment.d/99-good-enough-images.conf"
+if [ ! -f "$ENV_FILE" ]; then
+    echo "PATH=\"/opt/good-enough-images/bin:\$PATH\"" > "$ENV_FILE"
 fi
 
 if [ "$INSTALL_EVERYTHING" = "1" ]; then
@@ -98,7 +99,7 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
     fi
     rm -r /opt/good-enough-images 2> /dev/null
     rm -r /etc/good-enough-images.conf 2> /dev/null
-    sed -i '/MARKER: good-enough-images/d' /etc/environment
+    rm $ENV_FILE 2> /dev/null
     echo "Done."
   else
     echo "Installing everything..."
