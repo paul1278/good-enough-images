@@ -17,3 +17,6 @@ When it comes to networking, all containers use the `host`-network.
 ## Install
 Simply clone the repo and run `./install.sh -a`. To uninstall everything, use `./install.sh -a --remove`. You can also install a selection of images,
 for that run `./install.sh --image <imagename>`.
+
+## Updating images
+You can always do a quick `git pull` and follow the steps above to install a newer version. After that, you may have to download the docker-image for a final update. For that, use `./install.sh -a -u` or `./install.sh --image <imagename> -u` respectively.
