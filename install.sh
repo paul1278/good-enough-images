@@ -3,6 +3,7 @@ INSTALL_EVERYTHING=0
 IMAGE_NAME=""
 UNINSTALL=0
 UPDATE=0
+FIRST_INSTALL=0
 
 RESET="\e[0m"
 BOLD="\e[1m"
@@ -139,6 +140,7 @@ fi
 ENV_FILE="/etc/environment.d/99-good-enough-images.conf"
 if [ ! -f "$ENV_FILE" ]; then
     echo "PATH=\"/opt/good-enough-images/bin:\$PATH\"" > "$ENV_FILE"
+    FIRST_INSTALL=1
 fi
 
 mkdir -p /opt/good-enough-images
@@ -167,7 +169,7 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
         fi
     done
   else
-    echo "╔════════ Installing everything..."
+    echo "╔════════ Installing images..."
     for dir in */; do
         if [ -d "$dir" ]; then
             IMAGE_NAME="${dir%/}"
@@ -175,7 +177,6 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
             echo "║"
         fi
     done
-    echo "╚════════ Done."
   fi
 else
   if [ "$UNINSTALL" = "1" ]; then
@@ -192,6 +193,13 @@ else
     echo "Updating image: $IMAGE_NAME"
     docker pull ghcr.io/paul1278/good-enough-images:$IMAGE_NAME
   else
+    echo "╔════════ Install single image..."
     install_image "$IMAGE_NAME"
   fi
 fi
+if [ "$FIRST_INSTALL" = "1" ]; then
+    echo "║"
+    echo "╠ Please log out and log back in / reboot to apply the changes to your PATH."
+fi
+
+echo "╚════════ Done."
