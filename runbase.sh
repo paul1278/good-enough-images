@@ -26,8 +26,13 @@ if [ -f "$MOUNTFILE" ]; then
         MOUNTPARAMS="$MOUNTPARAMS -v $line"
     done < "$MOUNTFILE"
 fi
-
-sudo docker run --rm -i -t --network host --workdir /main \
+# Use gh or env
+IMAGE_FINAL="${OVERRIDE_IMAGE:-ghcr.io/paul1278/good-enough-images:$IMAGE}"
+DEBUG_ECHO=""
+if [ "$DEBUG" == "1" ]; then
+    DEBUG_ECHO="echo"
+fi
+$DEBUG_ECHO sudo docker run --rm -i -t --network host --workdir /main \
     -v $ALLWORKDIR:/main \
     $MOUNTPARAMS \
-    ghcr.io/paul1278/good-enough-images:$IMAGE "$@"
+    $IMAGE_FINAL "$@"
