@@ -1,5 +1,5 @@
 #!/bin/bash
-INSTALL_EVERYTHING=0
+FOCUS_EVERYTHING=0
 IMAGE_NAME=""
 UNINSTALL=0
 UPDATE=0
@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
         shift # past value
       ;;
     -a|--all)
-        INSTALL_EVERYTHING=1
+        FOCUS_EVERYTHING=1
         shift
       ;;
     -u|--update)
@@ -58,7 +58,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [ -z "$IMAGE_NAME" ] && [ "$INSTALL_EVERYTHING" = "0" ]; then
+if [ -z "$IMAGE_NAME" ] && [ "$FOCUS_EVERYTHING" = "0" ]; then
   error "--image argument is required or -a"
   exit 1
 fi
@@ -147,8 +147,25 @@ mkdir -p /opt/good-enough-images
 cp ./runbase.sh /opt/good-enough-images/runbase.sh
 chmod +x /opt/good-enough-images/runbase.sh
 
-if [ "$INSTALL_EVERYTHING" = "1" ]; then
-  if [ "$UNINSTALL" = "1" ]; then
+IMAGES_TO_FOCUS=()
+if [ "$FOCUS_EVERYTHING" = "0" ]; then
+  if [ -f "$IMAGE_NAME" ]; then
+    IMAGES_TO_FOCUS+=("$IMAGE_NAME")
+  else
+    IMAGES_TO_FOCUS+=("$IMAGE_NAME")
+  fi
+else
+  # Get all directories in the current directory
+  for dir in */; do
+      if [ -d "$dir" ]; then
+          IMAGE_NAME="${dir%/}"
+          IMAGES_TO_FOCUS+=("$IMAGE_NAME")
+      fi
+  done
+fi
+
+if [ "$UNINSTALL" = "1" ]; then
+  if [ "$FOCUS_EVERYTHING" = "1" ]; then
     echo "Uninstalling everything..."
     echo -n "Warning: This will remove all images, links, configs and working directories inside /opt/good-enough-images. Are you sure? [y/n] "
     read -r answer
@@ -160,12 +177,36 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
     rm -r /etc/good-enough-images.conf 2> /dev/null
     rm $ENV_FILE 2> /dev/null
     echo "Done."
+  else
+    error "Open TODO: Uninstalling a single image is not implemented yet."
+  fi
+elif [ "$UPDATE" = "1" ]; then
+  echo "╔════════ Updating"
+  for IMAGE_NAME in "${IMAGES_TO_FOCUS[@]}"; do
+    echo "╠ Updating image: $IMAGE_NAME"
+    docker pull ghcr.io/paul1278/good-enough-images:$IMAGE_NAME
+  done
+else
+  echo "╔════════ Installation"
+  for IMAGE_NAME in "${IMAGES_TO_FOCUS[@]}"; do
+    install_image "$IMAGE_NAME"
+    echo "║"
+  done
+fi
+if [ "$FIRST_INSTALL" = "1" ]; then
+    echo "║"
+    echo "╠ Please log out and log back in / reboot to apply the changes to your PATH."
+fi
+
+echo "╚════════ Done."
+exit
+if [ "$INSTALL_EVERYTHING" = "1" ]; then
+  if [ "$UNINSTALL" = "1" ]; then
   elif [ "$UPDATE" = "1" ]; then
     echo "Updating everything..."
     for dir in */; do
         if [ -d "$dir" ]; then
             IMAGE_NAME="${dir%/}"
-            docker pull ghcr.io/paul1278/good-enough-images:$IMAGE_NAME
         fi
     done
   else
@@ -180,26 +221,10 @@ if [ "$INSTALL_EVERYTHING" = "1" ]; then
   fi
 else
   if [ "$UNINSTALL" = "1" ]; then
-    echo "Uninstalling image: $IMAGE_NAME"
-    echo -n "Warning: This will remove all images, links, configs and working directories inside /opt/good-enough-images/$IMAGE_NAME. Are you sure? [y/n] "
-    read -r answer
-    if [[ ! $answer =~ ^[Yy]$ ]]; then
-        echo "Aborting."
-        exit 1
-    fi
-    # TODO: Remove bin links
-    rm -r /opt/good-enough-images/$IMAGE_NAME 2> /dev/null
   elif [ "$UPDATE" = "1" ]; then
     echo "Updating image: $IMAGE_NAME"
     docker pull ghcr.io/paul1278/good-enough-images:$IMAGE_NAME
   else
-    echo "╔════════ Install single image..."
     install_image "$IMAGE_NAME"
   fi
 fi
-if [ "$FIRST_INSTALL" = "1" ]; then
-    echo "║"
-    echo "╠ Please log out and log back in / reboot to apply the changes to your PATH."
-fi
-
-echo "╚════════ Done."
