@@ -6,6 +6,7 @@ UPDATE=0
 
 RESET="\e[0m"
 BOLD="\e[1m"
+RED="\e[31m"
 
 function usage {
     echo "Usage: $0 [options]"
@@ -15,6 +16,10 @@ function usage {
     echo "  -u, --update          Update the image"
     echo "  -r, --remove          Uninstall the image"
     echo "  -h, --help            Show this help message"
+}
+
+function error {
+    printf "${RED}${BOLD}Error:${RESET} $1\n"
 }
 
 POSITIONAL_ARGS=()
@@ -53,12 +58,12 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z "$IMAGE_NAME" ] && [ "$INSTALL_EVERYTHING" = "0" ]; then
-  echo "Error: --image argument is required or -a"
+  error "--image argument is required or -a"
   exit 1
 fi
 
 if [ `id -u` -ne 0 ]; then
-    echo "This script must be run as root"
+    error "This script must be run as root"
     exit 1
 fi
 
@@ -66,6 +71,12 @@ cd `dirname "$0"`
 
 function install_image {
     IMG_NAME="$1"
+    IMAGE_DIR="$(dirname "$(realpath "$0")")/$IMG_NAME"
+    LINKS_FILE="$IMAGE_DIR/links"
+    if [ ! -d "$IMAGE_DIR" ]; then
+        error "There is no image named $IMG_NAME"
+        exit 1
+    fi
     mkdir -p /opt/good-enough-images/bin
     mkdir -p /opt/good-enough-images/workdir/all
     mkdir -p /opt/good-enough-images/workdir/$IMG_NAME
@@ -74,42 +85,49 @@ function install_image {
     # Open directory with that name and look for run.sh and links-file relative to this file.
     # If both exist, copy run.sh to /opt/good-enough-images/bin and link to every path in links-file
     # If not, print error message
-    IMAGE_DIR="$(dirname "$(realpath "$0")")/$IMG_NAME"
-    RUN_SCRIPT="$IMAGE_DIR/run.sh"
-    LINKS_FILE="$IMAGE_DIR/links"
     
     cp "$IMAGE_DIR"/mount /opt/good-enough-images/configs/$IMG_NAME.mount 2>/dev/null
-
-    if [ -f "$RUN_SCRIPT" ]; then
-      cp "$RUN_SCRIPT" /opt/good-enough-images/bin/g-$IMG_NAME
+    create_runfile "$IMG_NAME" "$IMAGE_DIR"
+  
+    if [[ -f "$LINKS_FILE" ]]; then
+      add_links "$LINKS_FILE"
     else
-      cat <<EOF > /opt/good-enough-images/bin/g-$IMG_NAME
+        error "Missing links-file in $IMAGE_DIR"
+        exit 1
+    fi
+}
+
+function add_links {
+  while IFS= read -r LINK_PATH || [ "$LINK_PATH" ]; do
+      # Skip empty lines and comments
+      if [[ -z "$LINK_PATH" || "$LINK_PATH" =~ ^# ]]; then
+          continue
+      fi
+      # Split on \t into name and path
+      IFS=$' ' read -r NAME LPATH <<< "$LINK_PATH"
+      if [ -z "$LPATH" ]; then
+        LPATH="$NAME"
+      fi
+      LPATH="/opt/good-enough-images/bin/$LPATH"
+      printf "╠═ Linking $BOLD$NAME$RESET to $LPATH\n"
+      printf "#!/bin/bash\n/opt/good-enough-images/bin/g-$IMG_NAME $NAME \"\$@\"" > $LPATH
+      chmod +x $LPATH
+  done < "$1"
+}
+
+function create_runfile {
+  IMG_NAME="$1"
+  RUN_SCRIPT="$2/run.sh"
+  if [ -f "$RUN_SCRIPT" ]; then
+    cp "$RUN_SCRIPT" /opt/good-enough-images/bin/g-$IMG_NAME
+  else
+    cat <<EOF > /opt/good-enough-images/bin/g-$IMG_NAME
 #!/bin/bash
 /opt/good-enough-images/runbase.sh $IMG_NAME "\$@"
 EOF
-      chmod +x /opt/good-enough-images/bin/g-$IMG_NAME
-    fi
-    # TODO: Move this to a new function for removing etc.
-    if [[ -f "$LINKS_FILE" ]]; then
-        while IFS= read -r LINK_PATH || [ "$LINK_PATH" ]; do
-            # Skip empty lines and comments
-            if [[ -z "$LINK_PATH" || "$LINK_PATH" =~ ^# ]]; then
-                continue
-            fi
-            # Split on \t into name and path
-            IFS=$' ' read -r NAME LPATH <<< "$LINK_PATH"
-            if [ -z "$LPATH" ]; then
-              LPATH="$NAME"
-            fi
-            LPATH="/opt/good-enough-images/bin/$LPATH"
-            printf "╠═ Linking $BOLD$NAME$RESET to $LPATH\n"
-            printf "#!/bin/bash\n/opt/good-enough-images/bin/g-$IMG_NAME $NAME \"\$@\"" > $LPATH
-            chmod +x $LPATH
-        done < "$LINKS_FILE"
-    else
-        echo "Error: Missing run.sh or links-file in $IMAGE_DIR"
-        exit 1
-    fi
+    chmod +x /opt/good-enough-images/bin/g-$IMG_NAME
+    echo "╠═ Using generated run-script"
+  fi
 }
 
 # Copy default.conf to /etc/good-enough-images.conf
