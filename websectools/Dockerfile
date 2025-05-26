@@ -8,3 +8,8 @@ RUN wget https://github.com/sullo/nikto/archive/refs/tags/2.5.0.tar.gz && \
     cd nikto/program && \
     chmod +x nikto.pl && \
     ln -s $(pwd)/nikto.pl /usr/local/bin/nikto
+RUN wget https://github.com/sqlmapproject/sqlmap/tarball/master && \
+    tar -xzf master && \
+    mv sqlmapproject* /opt/sqlmap && \
+    rm master && \
+    ln -s /opt/sqlmap/sqlmap.py /usr/local/bin/sqlmap
