@@ -56,6 +56,6 @@ else
 fi
 $DEBUG_ECHO sudo docker run --rm -i -t --network host --workdir $WORKDIR \
     -v $ALLWORKDIR:/main \
-    --user $RUN_UID \
+    --user $RUN_UID:$RUN_UID \
     $MOUNTPARAMS \
     $IMAGE_FINAL "$@"
