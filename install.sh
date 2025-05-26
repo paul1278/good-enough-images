@@ -78,9 +78,18 @@ function install_image {
         error "There is no image named $IMG_NAME"
         exit 1
     fi
+    HOMEDIR=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+    if [ -z "$HOMEDIR" ]; then
+        error "Could not determine home directory for user $SUDO_USER"
+        exit 1
+    fi
+    HOMEDIR="$HOMEDIR/.good-enough-images"
     mkdir -p /opt/good-enough-images/bin
-    mkdir -p /opt/good-enough-images/workdir/all
-    mkdir -p /opt/good-enough-images/workdir/$IMG_NAME
+    mkdir -p $HOMEDIR/all
+    mkdir -p $HOMEDIR/$IMG_NAME
+    chown -R $SUDO_USER:$SUDO_USER $HOMEDIR/all
+    chown -R $SUDO_USER:$SUDO_USER $HOMEDIR/$IMG_NAME
+  
     printf "╠ Installing image: $BOLD$IMG_NAME$RESET\n"
     
     # Open directory with that name and look for run.sh and links-file relative to this file.
@@ -88,8 +97,9 @@ function install_image {
     # If not, print error message
     
     cp "$IMAGE_DIR"/mount /opt/good-enough-images/configs/$IMG_NAME.mount 2>/dev/null
+    cp "$IMAGE_DIR"/user /opt/good-enough-images/configs/$IMG_NAME.user 2>/dev/null
     create_runfile "$IMG_NAME" "$IMAGE_DIR"
-  
+    
     if [[ -f "$LINKS_FILE" ]]; then
       add_links "$LINKS_FILE"
     else
