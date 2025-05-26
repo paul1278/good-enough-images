@@ -10,7 +10,7 @@ for dir in */; do
     while IFS= read -r LINK_PATH || [ "$LINK_PATH" ]; do
         [[ -z "$LINK_PATH" || "$LINK_PATH" =~ ^# ]] && continue
         IFS=$' ' read -r NAME LPATH <<< "$LINK_PATH"
-        LINKS="$LINKS- ${LPATH:-$NAME},"
+        LINKS="$LINKS- ${LPATH:-$NAME} (${dir%/}),"
     done < "$LINK_FILE"
 done
 

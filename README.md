@@ -7,81 +7,82 @@ For example, after installing the `metasploit`-image, you can use `msfconsole` a
 
 Currently, the following commands can be used:
 <!-- LIST COMMANDS -->
-- bopscrk
-- certipy
-- cme
-- dirb
-- git-dumper
-- impacket-addcomputer
-- impacket-atexec
-- impacket-changepasswd
-- impacket-dacledit
-- impacket-dcomexec
-- impacket-describeTicket
-- impacket-dpapi
-- impacket-DumpNTLMInfo
-- impacket-esentutl
-- impacket-exchanger
-- impacket-findDelegation
-- impacket-GetADComputers
-- impacket-GetADUsers
-- impacket-getArch
-- impacket-Get-GPPPassword
-- impacket-GetLAPSPassword
-- impacket-GetNPUsers
-- impacket-getPac
-- impacket-getST
-- impacket-getTGT
-- impacket-GetUserSPNs
-- impacket-goldenPac
-- impacket-karmaSMB
-- impacket-keylistattack
-- impacket-kintercept
-- impacket-lookupsid
-- impacket-machine_role
-- impacket-mimikatz
-- impacket-mqtt_check
-- impacket-mssqlclient
-- impacket-mssqlinstance
-- impacket-net
-- impacket-netview
-- impacket-ntfs-read
-- impacket-ntlmrelayx
-- impacket-owneredit
-- impacket-ping
-- impacket-ping6
-- impacket-psexec
-- impacket-raiseChild
-- impacket-rbcd
-- impacket-rdp_check
-- impacket-reg
-- impacket-registry-read
-- impacket-rpcdump
-- impacket-rpcmap
-- impacket-sambaPipe
-- impacket-samrdump
-- impacket-secretsdump
-- impacket-services
-- impacket-smbclient
-- impacket-smbexec
-- impacket-smbserver
-- impacket-sniff
-- impacket-sniffer
-- impacket-split
-- impacket-ticketConverter
-- impacket-ticketer
-- impacket-tstool
-- impacket-wmiexec
-- impacket-wmipersist
-- impacket-wmiquery
-- msfconsole
-- msfvenom
-- nikto
-- psudohash
-- responder-multirelay.py
-- responder.py
-- sqlmap
-- testssl.sh
+- bopscrk (wordlists)
+- certipy (certipy)
+- cme (cme)
+- dirb (websectools)
+- git-dumper (websectools)
+- impacket-addcomputer (impacket)
+- impacket-atexec (impacket)
+- impacket-changepasswd (impacket)
+- impacket-dacledit (impacket)
+- impacket-dcomexec (impacket)
+- impacket-describeTicket (impacket)
+- impacket-dpapi (impacket)
+- impacket-DumpNTLMInfo (impacket)
+- impacket-esentutl (impacket)
+- impacket-exchanger (impacket)
+- impacket-findDelegation (impacket)
+- impacket-GetADComputers (impacket)
+- impacket-GetADUsers (impacket)
+- impacket-getArch (impacket)
+- impacket-Get-GPPPassword (impacket)
+- impacket-GetLAPSPassword (impacket)
+- impacket-GetNPUsers (impacket)
+- impacket-getPac (impacket)
+- impacket-getST (impacket)
+- impacket-getTGT (impacket)
+- impacket-GetUserSPNs (impacket)
+- impacket-goldenPac (impacket)
+- impacket-karmaSMB (impacket)
+- impacket-keylistattack (impacket)
+- impacket-kintercept (impacket)
+- impacket-lookupsid (impacket)
+- impacket-machine_role (impacket)
+- impacket-mimikatz (impacket)
+- impacket-mqtt_check (impacket)
+- impacket-mssqlclient (impacket)
+- impacket-mssqlinstance (impacket)
+- impacket-net (impacket)
+- impacket-netview (impacket)
+- impacket-ntfs-read (impacket)
+- impacket-ntlmrelayx (impacket)
+- impacket-owneredit (impacket)
+- impacket-ping6 (impacket)
+- impacket-ping (impacket)
+- impacket-psexec (impacket)
+- impacket-raiseChild (impacket)
+- impacket-rbcd (impacket)
+- impacket-rdp_check (impacket)
+- impacket-reg (impacket)
+- impacket-registry-read (impacket)
+- impacket-rpcdump (impacket)
+- impacket-rpcmap (impacket)
+- impacket-sambaPipe (impacket)
+- impacket-samrdump (impacket)
+- impacket-secretsdump (impacket)
+- impacket-services (impacket)
+- impacket-smbclient (impacket)
+- impacket-smbexec (impacket)
+- impacket-smbserver (impacket)
+- impacket-sniffer (impacket)
+- impacket-sniff (impacket)
+- impacket-split (impacket)
+- impacket-ticketConverter (impacket)
+- impacket-ticketer (impacket)
+- impacket-tstool (impacket)
+- impacket-wmiexec (impacket)
+- impacket-wmipersist (impacket)
+- impacket-wmiquery (impacket)
+- msfconsole (metasploit)
+- msfvenom (metasploit)
+- nikto (websectools)
+- pdflatex (miktex)
+- psudohash (wordlists)
+- responder-multirelay.py (responder)
+- responder.py (responder)
+- sqlmap (websectools)
+- testssl.sh (sslcheck)
 <!-- END LIST COMMANDS -->
 
 ## Params for all images
