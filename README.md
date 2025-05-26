@@ -20,3 +20,8 @@ for that run `./install.sh --image <imagename>`.
 
 ## Updating images
 You can always do a quick `git pull` and follow the steps above to install a newer version. After that, you may have to download the docker-image for a final update. For that, use `./install.sh -a -u` or `./install.sh --image <imagename> -u` respectively.
+
+## Debugging
+For easier debugging, there are some environment variables to modify the behavior of the `runbase.sh` script. This is the default run-script for any image not providing an own script.
+- `DEBUG=1` won't run images, it will only print the `docker run` command.
+- `OVERRIDE_IMAGE=...` changes the image which will be used to run. Perfect when building locally.
